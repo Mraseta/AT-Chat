@@ -1,0 +1,3 @@
+Manifest-Version: 1.0
+Class-Path: ChatJARClient.jar
+Dependencies: deployment.ChatEAR.ear.ChatWAR.war

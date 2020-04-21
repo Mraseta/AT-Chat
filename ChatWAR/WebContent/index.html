@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="ISO-8859-1">
+<title>Insert title here</title>
+<script src="jquery-1.11.0.js" ></script>
+<script>
+var socket;
+var host = "ws://localhost:8080/ChatWAR/ws";
+$(document).ready(function() {
+	$("#btnPost").click(function() {
+    	$.ajax({
+    		url: "rest/chat/post/asdfasdf",
+    		type:"POST",
+    		data: {},
+    		contentType:"application/json",
+    		dataType:"json",
+    		complete: function(data) {
+    			console.log('Sent message to the server.');
+    		}
+    	});
+	});
+	
+	try{
+	    socket = new WebSocket(host);
+	    console.log('connect: Socket Status: '+socket.readyState);
+	
+	    socket.onopen = function(){
+	   	 console.log('onopen: Socket Status: '+socket.readyState+' (open)');
+	    }
+	
+	    socket.onmessage = function(msg){
+	   	 console.log('onmessage: Received: '+ msg.data);
+	    }
+	
+	    socket.onclose = function(){
+	    	socket = null;
+	    }			
+	
+	} catch(exception){
+	   console.log('Error'+exception);
+	}
+});
+
+</script>
+</head>
+<body>
+	Hello! <br />
+	<a href="rest/chat/test">Test</a> <br /> <br />
+	<button id="btnPost">Proba slanja</button> <br />
+</body>
+</html>
