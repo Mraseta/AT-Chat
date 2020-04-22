@@ -1,52 +1,13 @@
-<!DOCTYPE html>
-<html>
+<!doctype html>
+<html lang="en">
 <head>
-<meta charset="ISO-8859-1">
-<title>Insert title here</title>
-<script src="jquery-1.11.0.js" ></script>
-<script>
-var socket;
-var host = "ws://localhost:8080/ChatWAR/ws";
-$(document).ready(function() {
-	$("#btnPost").click(function() {
-    	$.ajax({
-    		url: "rest/chat/post/asdfasdf",
-    		type:"POST",
-    		data: {},
-    		contentType:"application/json",
-    		dataType:"json",
-    		complete: function(data) {
-    			console.log('Sent message to the server.');
-    		}
-    	});
-	});
-	
-	try{
-	    socket = new WebSocket(host);
-	    console.log('connect: Socket Status: '+socket.readyState);
-	
-	    socket.onopen = function(){
-	   	 console.log('onopen: Socket Status: '+socket.readyState+' (open)');
-	    }
-	
-	    socket.onmessage = function(msg){
-	   	 console.log('onmessage: Received: '+ msg.data);
-	    }
-	
-	    socket.onclose = function(){
-	    	socket = null;
-	    }			
-	
-	} catch(exception){
-	   console.log('Error'+exception);
-	}
-});
-
-</script>
-</head>
+  <meta charset="utf-8">
+  <title>ChatFront</title>
+  <base href=".">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" type="image/x-icon" href="favicon.ico">
+<link rel="stylesheet" href="styles.3ff695c00d717f2d2a11.css"></head>
 <body>
-	Hello! <br />
-	<a href="rest/chat/test">Test</a> <br /> <br />
-	<button id="btnPost">Proba slanja</button> <br />
-</body>
+  <app-root></app-root>
+<script src="runtime-es2015.c5fa8325f89fc516600b.js" type="module"></script><script src="runtime-es5.c5fa8325f89fc516600b.js" nomodule defer></script><script src="polyfills-es5.3e8196928d184a6e5319.js" nomodule defer></script><script src="polyfills-es2015.5b10b8fd823b6392f1fd.js" type="module"></script><script src="main-es2015.683e9fb4a8af909e447e.js" type="module"></script><script src="main-es5.683e9fb4a8af909e447e.js" nomodule defer></script></body>
 </html>
