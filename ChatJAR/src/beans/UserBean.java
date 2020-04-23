@@ -1,5 +1,7 @@
 package beans;
 
+import java.util.ArrayList;
+
 import javax.ejb.LocalBean;
 import javax.ejb.Stateless;
 import javax.ws.rs.Consumes;
@@ -40,7 +42,7 @@ public class UserBean {
 	@POST
 	@Path("/login")
 	@Consumes(MediaType.APPLICATION_JSON)
-	@Produces(MediaType.TEXT_PLAIN)
+	@Produces(MediaType.APPLICATION_JSON)
 	public Response login(User user) {
 		for(User u : Data.getAllUsers()) {
 			if(u.getUsername().equalsIgnoreCase(user.getUsername())) {
@@ -51,7 +53,7 @@ public class UserBean {
 				else {
 					System.out.println("User successfully logged in!");
 					Data.getLoggedUsers().add(user);
-					return Response.status(200).build();
+					return Response.status(200).entity(u).build();
 				}
 			}
 		}
@@ -62,44 +64,38 @@ public class UserBean {
 	
 	@GET
 	@Path("/loggedIn")
-	@Produces(MediaType.TEXT_PLAIN)
-	public String loggedIn() {
+	@Produces(MediaType.APPLICATION_JSON)
+	public ArrayList<User> loggedIn() {
+		ArrayList<User> users = new ArrayList<>();
+		
 		if(Data.getLoggedUsers().size() == 0) {
 			System.out.println("There are no logged in users!");
-			return "There are no logged in users!";
+			return users;
 		}
-		
-		String ret = "Logged users: ";
 		
 		for(User u : Data.getLoggedUsers()) {
-			ret += u.getUsername() + ", ";
+			users.add(u);
 		}
 		
-		ret = ret.substring(0, ret.length()-2);
-		System.out.println(ret);
-		
-		return ret;
+		return users;
 	}
 	
 	@GET
 	@Path("/registered")
-	@Produces(MediaType.TEXT_PLAIN)
-	public String registered() {
+	@Produces(MediaType.APPLICATION_JSON)
+	public ArrayList<User> registered() {
+		ArrayList<User> users = new ArrayList<>();
+		
 		if(Data.getAllUsers().size() == 0) {
 			System.out.println("There are no registered users!");
-			return "There are no registered in users!";
+			return users;
 		}
-		
-		String ret = "Registered users: ";
 		
 		for(User u : Data.getAllUsers()) {
-			ret += u.getUsername() + ", ";
+			users.add(u);
 		}
 		
-		ret = ret.substring(0, ret.length()-2);
-		System.out.println(ret);
-		
-		return ret;
+		return users;
 	}
 	
 	@DELETE
