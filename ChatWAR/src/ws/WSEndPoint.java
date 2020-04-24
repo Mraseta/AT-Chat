@@ -34,7 +34,7 @@ public class WSEndPoint {
 	
 	@OnMessage
 	public void echoTextMessage(String msg) {
-		System.out.println("ChatBean returned: " + chat.test());
+		//System.out.println("ChatBean returned: " + chat.test());
 		
 		try {
 	        for (Session s : sessions) {
