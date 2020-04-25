@@ -38,7 +38,7 @@ public class ChatBean implements ChatRemote, ChatLocal {
 	@Produces(MediaType.TEXT_PLAIN)
 	public String post(@PathParam("text") String text) {
 		System.out.println("Received message: " + text);
-		ws.echoTextMessage(text);
+		//ws.echoTextMessage(text);
 		/*
 		try {
 			QueueConnection connection = (QueueConnection) connectionFactory.createConnection("guest", "guest.guest.1");

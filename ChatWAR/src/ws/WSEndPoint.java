@@ -12,12 +12,14 @@ import javax.websocket.OnError;
 import javax.websocket.OnMessage;
 import javax.websocket.OnOpen;
 import javax.websocket.Session;
+import javax.websocket.server.PathParam;
 import javax.websocket.server.ServerEndpoint;
 
 import beans.ChatLocal;
+import beans.MessageLocal;
 
 @Singleton
-@ServerEndpoint("/ws")
+@ServerEndpoint("/ws/{user}")
 @LocalBean
 public class WSEndPoint {
 	static List<Session> sessions = new ArrayList<Session>();
@@ -25,9 +27,13 @@ public class WSEndPoint {
 	@EJB
 	ChatLocal chat;
 	
+	@EJB
+	MessageLocal mess;
+	
 	@OnOpen
-	public void onOpen(Session session) {
+	public void onOpen(@PathParam("user") String user, Session session) {
 		if (!sessions.contains(session)) {
+			session.getUserProperties().put("user", user);
 			sessions.add(session);
 		}
 	}
@@ -35,11 +41,16 @@ public class WSEndPoint {
 	@OnMessage
 	public void echoTextMessage(String msg) {
 		//System.out.println("ChatBean returned: " + chat.test());
+		String sender = msg.split("-")[0];
+		String receiver = msg.split("-")[1];
+		String content = msg.split("-")[2];
 		
 		try {
 	        for (Session s : sessions) {
-	        	System.out.println("WSEndPoint: " + msg);
-        		s.getBasicRemote().sendText(msg);
+	        	if(s.getUserProperties().get("user").equals(sender) || s.getUserProperties().get("user").equals(receiver)) {
+	        		System.out.println("WSEndPoint: " + content);
+	        		s.getBasicRemote().sendText(content);
+	        	}
 			}
 		} catch (IOException e) {
 			e.printStackTrace();

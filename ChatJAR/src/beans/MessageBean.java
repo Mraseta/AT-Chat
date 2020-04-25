@@ -23,7 +23,7 @@ import ws.WSEndPoint;
 @Stateless
 @Path("/messages")
 @LocalBean
-public class MessageBean {
+public class MessageBean implements MessageLocal {
 	@EJB
 	WSEndPoint ws;
 	
@@ -37,11 +37,12 @@ public class MessageBean {
 				message.setReceiver(u.getUsername());
 				Message m = new Message(message.getSender(), message.getReceiver(), message.getTime(), message.getSubject(), message.getContent());
 				Data.getMessages().add(m);
+				ws.echoTextMessage(message.getSender() + "-" + message.getReceiver() + "-" + message.getContent());
 			}
 		}
 		
 		System.out.println("Message: " + message.getContent() + " sent to everyone.");
-		ws.echoTextMessage(message.getContent());
+		
 		return Response.status(200).build();
 	}
 	
@@ -52,6 +53,7 @@ public class MessageBean {
 		message.setTime(LocalDateTime.now());
 		Data.getMessages().add(message);
 		System.out.println("Message: " + message.getContent() + " sent to " + message.getReceiver() + ".");
+		ws.echoTextMessage(message.getSender() + "-" + message.getReceiver() + "-" + message.getContent());
 		return Response.status(200).build();
 	}
 	
