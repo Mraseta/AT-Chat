@@ -36,6 +36,15 @@ public class WSEndPoint {
 			session.getUserProperties().put("user", user);
 			sessions.add(session);
 		}
+		
+		for(Session s : sessions) {
+			try {
+				s.getBasicRemote().sendText(user + " now online");
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
 	}
 	
 	@OnMessage
