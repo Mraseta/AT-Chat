@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 import javax.ejb.Singleton;
 
+import models.Host;
 import models.Message;
 import models.User;
 
@@ -12,6 +13,7 @@ public class Data {
 	private static ArrayList<User> allUsers = new ArrayList<>();
 	private static ArrayList<User> loggedUsers = new ArrayList<>();
 	private static ArrayList<Message> messages = new ArrayList<>();
+	private static ArrayList<Host> hosts = new ArrayList<>();
 	
 	static {
 		User u = new User("roki", "roki");
@@ -20,7 +22,7 @@ public class Data {
 		allUsers.add(new User("mika", "mika"));
 		allUsers.add(u);
 		
-		loggedUsers.add(u);
+		
 	}
 
 	public static ArrayList<User> getAllUsers() {
@@ -45,5 +47,13 @@ public class Data {
 
 	public static void setMessages(ArrayList<Message> messages) {
 		Data.messages = messages;
+	}
+
+	public static ArrayList<Host> getHosts() {
+		return hosts;
+	}
+
+	public static void setHosts(ArrayList<Host> hosts) {
+		Data.hosts = hosts;
 	}
 }

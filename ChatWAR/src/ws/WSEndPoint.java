@@ -69,6 +69,14 @@ public class WSEndPoint {
 	@OnClose
 	public void close(Session session) {
 		sessions.remove(session);
+		for(Session s : sessions) {
+			try {
+				s.getBasicRemote().sendText(s.getUserProperties().get("user") + " now offline");
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
 	}
 	
 	@OnError
