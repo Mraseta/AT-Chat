@@ -11,10 +11,16 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.client.Entity;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import org.jboss.resteasy.client.jaxrs.ResteasyClient;
+import org.jboss.resteasy.client.jaxrs.ResteasyClientBuilder;
+import org.jboss.resteasy.client.jaxrs.ResteasyWebTarget;
+
 import data.Data;
+import models.Host;
 import models.User;
 
 @Stateless
@@ -53,6 +59,15 @@ public class UserBean {
 				else {
 					System.out.println("User successfully logged in!");
 					Data.getLoggedUsers().add(user);
+					
+					for(Host h : Data.getHosts()) {
+						ResteasyClient rc = new ResteasyClientBuilder().build();
+						String path = "http://" + h.getAddress() + ":8080/ChatWAR/rest/users/loggedIn";					
+						ResteasyWebTarget rwt = rc.target(path);		
+						Response response = rwt.request(MediaType.APPLICATION_JSON).post(Entity.entity(Data.getLoggedUsers(), MediaType.APPLICATION_JSON));
+						System.out.println(response);
+					}
+					
 					return Response.status(200).entity(u).build();
 				}
 			}
@@ -111,5 +126,18 @@ public class UserBean {
 		
 		System.out.println("User " + user + " not found!");
 		return Response.status(400).build();
+	}
+	
+	@POST
+	@Path("/loggedIn")
+	@Consumes(MediaType.APPLICATION_JSON)
+	public Response postLoggedIn(ArrayList<User> users) {
+		for(User u : users) {
+			if(!Data.getLoggedUsers().contains(u)) {
+				Data.getLoggedUsers().add(u);
+			}
+		}
+		
+		return Response.status(200).build();
 	}
 }
