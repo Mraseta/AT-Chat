@@ -10,14 +10,20 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
+import javax.annotation.Resource;
+import javax.ejb.Schedule;
+import javax.ejb.Schedules;
 import javax.ejb.Singleton;
 import javax.ejb.Startup;
+import javax.ejb.TimerService;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
+import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
@@ -37,6 +43,9 @@ import models.User;
 @Startup
 @Path("/hosts")
 public class HostBean {
+	@Resource
+	TimerService ts;
+	
 	private String master = "";
 	private String hostip = "";
 	
@@ -48,9 +57,12 @@ public class HostBean {
 			InputStream in = getClass().getClassLoader().getResourceAsStream("master.txt");
 			reader = new BufferedReader(new InputStreamReader(in));
 			String fileContent = reader.readLine();
-			System.out.println(fileContent);
+			System.out.println("FC " + fileContent);
 			InetAddress ip = InetAddress.getLocalHost();
 			this.hostip = ip.toString().split("/")[1].split("\n")[0];
+			
+			Host n = new Host(this.hostip, this.hostip);
+			Data.getHosts().add(n);
 			
 			in.close();
 			
@@ -188,5 +200,52 @@ public class HostBean {
 		}
 		
 		return Response.status(400).build();
+	}
+	
+	@GET
+	@Path("/node")
+	public Response getNode() {
+		System.out.println("pingovan");
+		return Response.status(200).build();
+	}
+	
+	@Schedules({
+		@Schedule(hour="*", minute="*", second="*/10")
+	})
+	public void heartbeat() {
+		System.out.println("entered heartbeat " + Data.getHosts().size());
+		InetAddress ip = null;
+		try {
+			ip = InetAddress.getLocalHost();
+		} catch (UnknownHostException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		String k = ip.toString().split("/")[1].split("\n")[0];
+		
+		for(Host h : Data.getHosts()) {
+			if(!h.getAddress().equals(k)) {
+				ResteasyClient rc = new ResteasyClientBuilder().build();			
+				String path = "http://" + h.getAddress() + ":8080/ChatWAR/rest/hosts/node";
+				ResteasyWebTarget rwt = rc.target(path);
+				Response response = rwt.request(MediaType.APPLICATION_JSON).get();
+				System.out.println(response);
+				
+				if(response.getStatus() != Response.Status.OK.ordinal()) {
+					Response response2 = rwt.request(MediaType.APPLICATION_JSON).get();
+					if(response2.getStatus() != Response.Status.OK.ordinal()) {		
+						for(Host h2 : Data.getHosts()) {
+							if(!h2.getAddress().equals(h.getAddress())) {
+								ResteasyClient rc2 = new ResteasyClientBuilder().build();			
+								String path2 = "http://" + h2.getAddress() + ":8080/ChatWAR/rest/hosts/node/" + h.getAlias();
+								ResteasyWebTarget rwt2 = rc2.target(path2);
+								Response response3 = rwt2.request(MediaType.APPLICATION_JSON).get();
+								System.out.println(response3);
+							}
+						}
+					}
+				}
+			}
+		}
 	}
 }

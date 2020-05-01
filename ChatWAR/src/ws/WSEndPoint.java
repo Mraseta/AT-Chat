@@ -49,20 +49,30 @@ public class WSEndPoint {
 	
 	@OnMessage
 	public void echoTextMessage(String msg) {
-		//System.out.println("ChatBean returned: " + chat.test());
-		String sender = msg.split("-")[0];
-		String receiver = msg.split("-")[1];
-		String content = msg.split("-")[2];
-		
-		try {
-	        for (Session s : sessions) {
-	        	if(s.getUserProperties().get("user").equals(sender) || s.getUserProperties().get("user").equals(receiver)) {
-	        		System.out.println("WSEndPoint: " + content);
-	        		s.getBasicRemote().sendText(content);
-	        	}
+		if(msg.contains("refresh")) {
+			for(Session s : sessions) {
+				try {
+					s.getBasicRemote().sendText(msg);
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 			}
-		} catch (IOException e) {
-			e.printStackTrace();
+		}else {		
+			String sender = msg.split("-")[0];
+			String receiver = msg.split("-")[1];
+			String content = msg.split("-")[2];
+		
+			try {
+	        	for (Session s : sessions) {
+	        		if(s.getUserProperties().get("user").equals(sender) || s.getUserProperties().get("user").equals(receiver)) {
+	        			System.out.println("WSEndPoint: " + content);
+	        			s.getBasicRemote().sendText(content);
+	        		}
+				}
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
 		}
 	}
 

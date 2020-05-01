@@ -1,7 +1,10 @@
 package beans;
 
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 
+import javax.ejb.EJB;
 import javax.ejb.LocalBean;
 import javax.ejb.Stateless;
 import javax.ws.rs.Consumes;
@@ -22,11 +25,16 @@ import org.jboss.resteasy.client.jaxrs.ResteasyWebTarget;
 import data.Data;
 import models.Host;
 import models.User;
+import ws.WSEndPoint;
 
 @Stateless
 @Path("/users")
 @LocalBean
 public class UserBean {
+	
+	@EJB
+	WSEndPoint ws;
+	
 	@POST
 	@Path("/register")
 	@Consumes(MediaType.APPLICATION_JSON)
@@ -59,6 +67,21 @@ public class UserBean {
 				else {
 					System.out.println("User successfully logged in!");
 					Data.getLoggedUsers().add(user);
+
+					InetAddress ip = null;
+					try {
+						ip = InetAddress.getLocalHost();
+					} catch (UnknownHostException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+					String k = ip.toString().split("/")[1].split("\n")[0];
+					
+					for(Host h : Data.getHosts()) {
+						if(h.getAlias().equals(k)) {
+							user.setHost(h);
+						}
+					}
 					
 					for(Host h : Data.getHosts()) {
 						ResteasyClient rc = new ResteasyClientBuilder().build();
@@ -137,6 +160,8 @@ public class UserBean {
 				Data.getLoggedUsers().add(u);
 			}
 		}
+		
+		ws.echoTextMessage("refresh logged");
 		
 		return Response.status(200).build();
 	}
