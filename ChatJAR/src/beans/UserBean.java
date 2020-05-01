@@ -80,15 +80,18 @@ public class UserBean {
 					for(Host h : Data.getHosts()) {
 						if(h.getAlias().equals(k)) {
 							user.setHost(h);
+							u.setHost(h);
 						}
 					}
 					
 					for(Host h : Data.getHosts()) {
-						ResteasyClient rc = new ResteasyClientBuilder().build();
-						String path = "http://" + h.getAddress() + ":8080/ChatWAR/rest/users/loggedIn";					
-						ResteasyWebTarget rwt = rc.target(path);		
-						Response response = rwt.request(MediaType.APPLICATION_JSON).post(Entity.entity(Data.getLoggedUsers(), MediaType.APPLICATION_JSON));
-						System.out.println(response);
+						if(!h.getAlias().equals(k)) {
+							ResteasyClient rc = new ResteasyClientBuilder().build();
+							String path = "http://" + h.getAddress() + ":8080/ChatWAR/rest/users/loggedIn";					
+							ResteasyWebTarget rwt = rc.target(path);		
+							Response response = rwt.request(MediaType.APPLICATION_JSON).post(Entity.entity(Data.getLoggedUsers(), MediaType.APPLICATION_JSON));
+							System.out.println(response);
+						}
 					}
 					
 					return Response.status(200).entity(u).build();

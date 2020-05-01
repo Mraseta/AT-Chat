@@ -66,25 +66,25 @@ public class HostBean {
 			
 			in.close();
 			
-			System.out.println(hostip);			
+			System.out.println(hostip + " aaaa " + fileContent.split("=").length);
 			
 			if (fileContent.split("=").length == 1) {
 				String a = fileContent + this.hostip;
 				System.out.println(a);
-				File f = new File("master2.txt");
-				boolean pl = f.createNewFile();
-				System.out.println(pl);
-				writer = new BufferedWriter(new FileWriter(f));
-				writer.write(fileContent + this.hostip);
 				System.out.println("\n\n\n\n nema master");
 				this.master = this.hostip;
 			} else {
 				this.master = fileContent.split("=")[1];
+				ResteasyClient rc = new ResteasyClientBuilder().build();			
+				String path = "http://" + this.master + ":8080/ChatWAR/rest/hosts/register";
+				ResteasyWebTarget rwt = rc.target(path);
+				Response response = rwt.request(MediaType.APPLICATION_JSON).post(Entity.entity(n, MediaType.APPLICATION_JSON));
+				System.out.println(response);
 			}
 
 		} catch (Exception e) {
 			e.printStackTrace();
-		} finally {
+		} /*finally {
 			System.out.println("finally");
 			try {
 				reader.close();
@@ -98,7 +98,7 @@ public class HostBean {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-		}
+		}*/
 	}
 	
 	@PreDestroy
@@ -209,8 +209,8 @@ public class HostBean {
 		return Response.status(200).build();
 	}
 	
-	@Schedules({
-		@Schedule(hour="*", minute="*", second="*/10")
+	/*@Schedules({
+		@Schedule(hour="*", minute="*", second="10")
 	})
 	public void heartbeat() {
 		System.out.println("entered heartbeat " + Data.getHosts().size());
@@ -247,5 +247,5 @@ public class HostBean {
 				}
 			}
 		}
-	}
+	}*/
 }

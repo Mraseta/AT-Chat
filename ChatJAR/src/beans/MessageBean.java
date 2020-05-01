@@ -66,12 +66,16 @@ public class MessageBean implements MessageLocal {
 		}
 		String h = ip.toString().split("/")[1].split("\n")[0];
 		
+		System.out.println(h);
+		
+		boolean otherHost = false;
 		
 		message.setTime(LocalDateTime.now());
-		User receiver = null;
 		for(User u : Data.getAllUsers()) {
 			if(u.getUsername().equals(message.getReceiver())) {
 				if(!u.getHost().getAddress().equals(h)) {
+					System.out.println("usao");
+					otherHost = true;
 					ResteasyClient rc = new ResteasyClientBuilder().build();			
 					String path = "http://" + u.getHost().getAddress() + ":8080/ChatWAR/rest/messages/user";
 					ResteasyWebTarget rwt = rc.target(path);
@@ -80,9 +84,13 @@ public class MessageBean implements MessageLocal {
 				}
 			}
 		}
-		Data.getMessages().add(message);
-		System.out.println("Message: " + message.getContent() + " sent to " + message.getReceiver() + ".");
-		ws.echoTextMessage(message.getSender() + "-" + message.getReceiver() + "-" + message.getContent());
+		
+		if(!otherHost) {
+			Data.getMessages().add(message);
+			System.out.println("Message: " + message.getContent() + " sent to " + message.getReceiver() + ".");
+			ws.echoTextMessage(message.getSender() + "-" + message.getReceiver() + "-" + message.getContent());
+		}
+		
 		return Response.status(200).build();
 	}
 	
