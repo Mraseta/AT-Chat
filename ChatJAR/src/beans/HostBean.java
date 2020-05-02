@@ -123,12 +123,15 @@ public class HostBean {
 	@Path("/register")
 	@Consumes(MediaType.APPLICATION_JSON)
 	public Response registerNode(Host host) {
+		//Data.getHosts().add(host);
 		for(Host h : Data.getHosts()) {
-			ResteasyClient rc = new ResteasyClientBuilder().build();
-			String path = "http://" + h.getAddress() + ":8080/ChatWAR/rest/hosts/node";
-			ResteasyWebTarget rwt = rc.target(path);
-			Response response = rwt.request(MediaType.APPLICATION_JSON).post(Entity.entity(host, MediaType.APPLICATION_JSON));
-			System.out.println(response);
+			if(!h.getAddress().equals(this.hostip)) {
+				ResteasyClient rc = new ResteasyClientBuilder().build();
+				String path = "http://" + h.getAddress() + ":8080/ChatWAR/rest/hosts/node";
+				ResteasyWebTarget rwt = rc.target(path);
+				Response response = rwt.request(MediaType.APPLICATION_JSON).post(Entity.entity(host, MediaType.APPLICATION_JSON));
+				System.out.println(response);
+			}
 		}
 		
 		ResteasyClient rc = new ResteasyClientBuilder().build();
@@ -153,11 +156,13 @@ public class HostBean {
 		
 		if(cnt==2) {
 			for(Host h : Data.getHosts()) {
-				ResteasyClient rc3 = new ResteasyClientBuilder().build();
-				String path3 = "http://" + h.getAddress() + ":8080/ChatWAR/rest/hosts/node/" + host.getAlias();
-				ResteasyWebTarget rwt3 = rc3.target(path3);
-				Response response3 = rwt3.request(MediaType.APPLICATION_JSON).delete();
-				System.out.println(response3);
+				if(!h.getAddress().equals(this.hostip)) {
+					ResteasyClient rc3 = new ResteasyClientBuilder().build();
+					String path3 = "http://" + h.getAddress() + ":8080/ChatWAR/rest/hosts/node/" + host.getAlias();
+					ResteasyWebTarget rwt3 = rc3.target(path3);
+					Response response3 = rwt3.request(MediaType.APPLICATION_JSON).delete();
+					System.out.println(response3);
+				}
 			}
 			
 			return Response.status(400).build();
