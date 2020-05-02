@@ -49,7 +49,7 @@ public class WSEndPoint {
 	
 	@OnMessage
 	public void echoTextMessage(String msg) {
-		if(msg.contains("refresh")) {
+		if(msg.contains("refresh") || msg.contains("now")) {
 			for(Session s : sessions) {
 				try {
 					s.getBasicRemote().sendText(msg);
@@ -58,7 +58,7 @@ public class WSEndPoint {
 					e.printStackTrace();
 				}
 			}
-		}else {		
+		}else {
 			String sender = msg.split("-")[0];
 			String receiver = msg.split("-")[1];
 			String content = msg.split("-")[2];

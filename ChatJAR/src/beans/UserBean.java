@@ -87,7 +87,8 @@ public class UserBean {
 					for(Host h : Data.getHosts()) {
 						if(!h.getAlias().equals(k)) {
 							ResteasyClient rc = new ResteasyClientBuilder().build();
-							String path = "http://" + h.getAddress() + ":8080/ChatWAR/rest/users/loggedIn";					
+							String path = "http://" + h.getAddress() + ":8080/ChatWAR/rest/users/loggedIn";
+							System.out.println(path);
 							ResteasyWebTarget rwt = rc.target(path);		
 							Response response = rwt.request(MediaType.APPLICATION_JSON).post(Entity.entity(Data.getLoggedUsers(), MediaType.APPLICATION_JSON));
 							System.out.println(response);
@@ -146,6 +147,7 @@ public class UserBean {
 			if(u.getUsername().equals(user)) {
 				Data.getLoggedUsers().remove(u);
 				System.out.println("User " + user + " has successfully logged out!");
+				ws.echoTextMessage(user + " now offline");
 				return Response.status(200).build();
 			}
 		}
@@ -164,8 +166,24 @@ public class UserBean {
 			}
 		}
 		
-		ws.echoTextMessage("refresh logged");
+		//ws.echoTextMessage("refresh logged");
 		
 		return Response.status(200).build();
+	}
+	
+	@GET
+	@Path("/loggedIn")
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
+	public ArrayList<User> getLoggedIn() {
+		ArrayList<User> ret = new ArrayList<>();
+		
+		for(User u : Data.getLoggedUsers()) {
+			ret.add(u);
+		}
+		
+		//ws.echoTextMessage("refresh logged");
+		
+		return ret;
 	}
 }

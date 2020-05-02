@@ -29,4 +29,11 @@ public class Host {
 	public void setAddress(String address) {
 		this.address = address;
 	}
+
+	@Override
+	public String toString() {
+		return "Host [alias=" + alias + ", address=" + address + "]";
+	}
+	
+	
 }
