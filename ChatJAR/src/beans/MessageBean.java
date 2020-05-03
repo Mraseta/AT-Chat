@@ -37,14 +37,19 @@ public class MessageBean implements MessageLocal {
 	@POST
 	@Path("/all")
 	@Consumes(MediaType.APPLICATION_JSON)
-	public Response sendToAll(Message message) {
-		message.setTime(LocalDateTime.now());
-		for(User u : Data.getAllUsers()) {
+	public Response sendToAll(Message message) {	
+		for(User u : Data.getLoggedUsers()) {
 			if(!u.getUsername().equals(message.getSender())) {
 				message.setReceiver(u.getUsername());
-				Message m = new Message(message.getSender(), message.getReceiver(), message.getTime(), message.getSubject(), message.getContent());
+				ResteasyClient rc = new ResteasyClientBuilder().build();			
+				String path = "http://" + u.getHost().getAddress() + ":8080/ChatWAR/rest/messages/user";
+				ResteasyWebTarget rwt = rc.target(path);
+				Response response = rwt.request(MediaType.APPLICATION_JSON).post(Entity.entity(message, MediaType.APPLICATION_JSON));
+				System.out.println(response);
+				/*Message m = new Message(message.getSender(), message.getReceiver(), message.getTime(), message.getSubject(), message.getContent());
+				message.setTime(LocalDateTime.now());
 				Data.getMessages().add(m);
-				ws.echoTextMessage(message.getSender() + "-" + message.getReceiver() + "-" + message.getContent());
+				ws.echoTextMessage(message.getSender() + "-" + message.getReceiver() + "-" + message.getContent());*/
 			}
 		}
 		
@@ -70,8 +75,7 @@ public class MessageBean implements MessageLocal {
 		
 		boolean otherHost = false;
 		
-		message.setTime(LocalDateTime.now());
-		for(User u : Data.getAllUsers()) {
+		for(User u : Data.getLoggedUsers()) {
 			if(u.getUsername().equals(message.getReceiver())) {
 				if(!u.getHost().getAddress().equals(h)) {
 					System.out.println("usao");
@@ -85,11 +89,10 @@ public class MessageBean implements MessageLocal {
 			}
 		}
 		
-		if(!otherHost) {
-			Data.getMessages().add(message);
-			System.out.println("Message: " + message.getContent() + " sent to " + message.getReceiver() + ".");
-			ws.echoTextMessage(message.getSender() + "-" + message.getReceiver() + "-" + message.getContent());
-		}
+		message.setTime(LocalDateTime.now());
+		Data.getMessages().add(message);
+		System.out.println("Message: " + message.getContent() + " sent to " + message.getReceiver() + ".");
+		ws.echoTextMessage(message.getSender() + "-" + message.getReceiver() + "-" + message.getContent());
 		
 		return Response.status(200).build();
 	}

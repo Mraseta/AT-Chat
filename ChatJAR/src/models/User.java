@@ -49,6 +49,6 @@ public class User {
 
 	@Override
 	public String toString() {
-		return "username=" + username + ", password=" + password;
-	}	
+		return "username=" + username + ", password=" + password + ", host=" + host;
+	}
 }

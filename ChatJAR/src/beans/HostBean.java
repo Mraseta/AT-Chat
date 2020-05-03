@@ -44,8 +44,8 @@ import models.User;
 @Startup
 @Path("/hosts")
 public class HostBean {
-	@Resource
-	TimerService ts;
+	//@Resource
+	//TimerService ts;
 	
 	private String master = "";
 	private String hostip = "";
@@ -309,9 +309,9 @@ public class HostBean {
 				Response response = rwt.request(MediaType.APPLICATION_JSON).get();
 				System.out.println(response);
 				
-				if(response.getStatus() != Response.Status.OK.ordinal()) {
+				if(response.getStatus() != 200) {
 					Response response2 = rwt.request(MediaType.APPLICATION_JSON).get();
-					if(response2.getStatus() != Response.Status.OK.ordinal()) {
+					if(response2.getStatus() != 200) {
 						Data.getHosts().remove(h);
 						for(Host h2 : Data.getHosts()) {
 							if(!h2.getAddress().equals(h.getAddress()) && !h2.getAddress().equals(this.hostip)) {
@@ -325,6 +325,10 @@ public class HostBean {
 					}
 				}
 			}
+		}
+		
+		for(Host h : Data.getHosts()) {
+			System.out.println(h);
 		}
 	}
 	

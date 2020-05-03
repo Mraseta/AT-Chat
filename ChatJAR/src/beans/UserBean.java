@@ -82,10 +82,13 @@ public class UserBean {
 							user.setHost(h);
 							u.setHost(h);
 						}
+						
+						System.out.println(h);
 					}
 					
 					for(Host h : Data.getHosts()) {
 						if(!h.getAlias().equals(k)) {
+							System.out.println("usao u if " + h);
 							ResteasyClient rc = new ResteasyClientBuilder().build();
 							String path = "http://" + h.getAddress() + ":8080/ChatWAR/rest/users/loggedIn";
 							System.out.println(path);
@@ -144,10 +147,25 @@ public class UserBean {
 	@Path("/loggedIn/{user}")
 	public Response logout(@PathParam("user") String user) {
 		for(User u : Data.getLoggedUsers()) {
+			User a = u;
+			System.out.println(a);
 			if(u.getUsername().equals(user)) {
 				Data.getLoggedUsers().remove(u);
 				System.out.println("User " + user + " has successfully logged out!");
 				ws.echoTextMessage(user + " now offline");
+				
+				for(Host h : Data.getHosts()) {
+					System.out.println(h.getAddress() + " " + a.getHost().getAddress());
+					if(!h.getAddress().equals(a.getHost().getAddress())) {
+						ResteasyClient rc = new ResteasyClientBuilder().build();
+						String path = "http://" + h.getAddress() + ":8080/ChatWAR/rest/users/loggedIn";
+						System.out.println(path);
+						ResteasyWebTarget rwt = rc.target(path);
+						Response response = rwt.request(MediaType.APPLICATION_JSON).post(Entity.entity(Data.getLoggedUsers(), MediaType.APPLICATION_JSON));
+						System.out.println(response);
+					}
+				}
+				
 				return Response.status(200).build();
 			}
 		}
@@ -160,13 +178,38 @@ public class UserBean {
 	@Path("/loggedIn")
 	@Consumes(MediaType.APPLICATION_JSON)
 	public Response postLoggedIn(ArrayList<User> users) {
-		for(User u : users) {
-			if(!Data.getLoggedUsers().contains(u)) {
+		/*for(User u : users) {
+			boolean found = false;
+			for(int i=0;i<Data.getLoggedUsers().size();i++) {
+				if(u.getUsername().equals(Data.getLoggedUsers().get(i).getUsername())) {
+					found = true;
+					break;
+				}
+			}
+			
+			if(!found) {
 				Data.getLoggedUsers().add(u);
 			}
+		}*/
+		
+		/*for(User u : Data.getLoggedUsers()) {
+			System.out.println(u);
 		}
 		
-		//ws.echoTextMessage("refresh logged");
+		for(User u : Data.getLoggedUsers()) {
+			Data.getLoggedUsers().remove(u);
+			System.out.println("obrisao");
+		}*/
+		
+		Data.getLoggedUsers().clear();
+		
+		System.out.println(Data.getLoggedUsers().size());
+		
+		for(User u : users) {
+			Data.getLoggedUsers().add(u);
+		}
+		
+		ws.echoTextMessage("refresh logged");
 		
 		return Response.status(200).build();
 	}
