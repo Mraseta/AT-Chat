@@ -12,6 +12,7 @@ import java.io.OutputStream;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
+import java.util.List;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
@@ -29,6 +30,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.client.Entity;
+import javax.ws.rs.core.GenericType;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
@@ -90,9 +92,14 @@ public class HostBean {
 				System.out.println(path2);
 				ResteasyWebTarget rwt2 = rc2.target(path2);
 				Response response2 = rwt2.request(MediaType.APPLICATION_JSON).get();
-				ArrayList<Host> ret2 = (ArrayList<Host>) response2.getEntity();
+				ArrayList<Host> ret2 = (ArrayList<Host>) response2.readEntity(new GenericType<List<Host>>() {});
 				for(Host hh : ret2) {
-					Data.getHosts().add(hh);
+					boolean found = false;
+					for(int i=0;i<Data.getHosts().size();i++)
+						if(hh.getAddress().equals(Data.getHosts().get(i).getAddress()))
+							found = true;
+					if(!found)
+						Data.getHosts().add(hh);
 				}
 				
 				System.out.println(response2);
@@ -105,7 +112,7 @@ public class HostBean {
 					System.out.println(path3);
 					ResteasyWebTarget rwt3 = rc3.target(path3);
 					response3 = rwt3.request(MediaType.APPLICATION_JSON).get();
-					if(response3.getStatus() != Response.Status.OK.ordinal()) {
+					if(response3.getStatus() != 200) {
 						cnt++;
 						continue;
 					} else {
@@ -114,7 +121,7 @@ public class HostBean {
 				}
 				
 				if(cnt < 2) {
-					ArrayList<User> ret3 = (ArrayList<User>) response3.getEntity();
+					ArrayList<User> ret3 = (ArrayList<User>) response3.readEntity(new GenericType<List<User>>() {});
 					for(User uu : ret3) {
 						Data.getLoggedUsers().add(uu);
 					}
